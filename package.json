@@ -1,0 +1,23 @@
+{
+   "name": "COMP3006_Coursework",
+   "version": "1.0.0",
+   "keywords": [
+      "util",
+      "functional",
+      "server",
+      "client",
+      "browser"
+   ],
+   "author": "samue",
+   "contributors": [],
+   "dependencies": {
+      "body-parser": "^1.19.0",
+      "ejs": "^3.1.5",
+      "express": "^4.17.1",
+      "express-session": "^1.17.1",
+      "jsonwebtoken": "^8.5.1",
+      "mongoose": "^5.11.9",
+      "node": "^15.4.0",
+      "socket.io": "^3.0.4"
+   }
+}
