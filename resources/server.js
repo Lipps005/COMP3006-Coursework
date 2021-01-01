@@ -60,7 +60,7 @@ app.get("/login");
 //chat page - authorize token (if exists) - redirect to login page if not verified or none exists
 //verify userid exists
 //verify chat exists
-//start chat session
+//start chat socket
 //render all chat messages
 app.get("/users/:userid/chat/:chatid");
 
@@ -71,7 +71,8 @@ app.post("/api/auth/login");
 app.post("/api/auth/logout");
 
 
+//post message in chat
 
-
+app.post("api/:chatid/message");
 
 
