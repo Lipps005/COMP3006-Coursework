@@ -16,6 +16,7 @@ app = express();
 
 // Set up the static files.
 app.use(express.static(path.join(__dirname, "static")));
+app.set("views", path.join(__dirname, "views"));
 
 // Enable processing of post forms.
 app.use(express.urlencoded({extended: true}));

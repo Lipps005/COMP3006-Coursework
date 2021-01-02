@@ -1,8 +1,9 @@
-/* 
+/*
  * Author: Samuel Lippett
  * Project: COMP3006 Coursework
  */
 const jwt = require("jsonwebtoken");
+const db = require("./db");
 const authorization = require("./authorization");
 
 
@@ -10,16 +11,24 @@ const authorization = require("./authorization");
 
 async function loginUserRoute(req, res)
 {
-   console.log("here");
-   res.status(200).send("valid token! Redirect to chat page");
+
 }
 
 
 
 async function verifyLoginUserRoute(req, res)
 {
-   const token = authorization.generateAccessToken({ user_id: req.body.user_id });
-   res.json(token);
+   let aqz = await db.findUserByUsername(req.body.user_id);
+   if (aqz)
+   {
+      if (aqz.password === req.body.password)
+      {
+         const token = authorization.generateAccessToken({user_id: aqz.password});
+         res.status(200).send(token);
+      }
+   } 
+      res.status(500).send({error: "error verifying user"});
+
 }
 
 module.exports.loginUserRoute = loginUserRoute;

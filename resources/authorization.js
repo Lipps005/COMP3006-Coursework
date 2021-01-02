@@ -6,16 +6,21 @@ const jwt = require("jsonwebtoken");
 const ACCESS_TOKEN_SECRET = "doubledoubletoilandtrouble";
 
 function authToken(req, res, next) {
+   //retreive token from http header
    let token = req.headers['x-access-token'];
    if (!token)
    {
+      //respond 403 if no token
       return res.status(403).send({ message: "No token provided!" });
    }
-   console.log(token);
+   
+   //verify token using secret
    jwt.verify(token, ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) {
+       
       return res.status(401).send({ message: "Unauthorised Access!" });;
     }
+    //retreive user id and pass control onto route.
     req.body.user_id = decoded.user_id;
     next();
   });
@@ -26,6 +31,9 @@ function generateAccessToken(id) {
    // exp. 30 mins
    return jwt.sign({user_id: id}, ACCESS_TOKEN_SECRET, {expiresIn: '1800s'});
 }
+
+
+
 
 module.exports.authToken = authToken;
 module.exports.generateAccessToken = generateAccessToken;

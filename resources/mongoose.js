@@ -7,7 +7,7 @@
 const mongoose = require("mongoose");
 
 
-const User = mongoose.model("User", new mongoose.Schema({
+const USER = mongoose.model("USER", new mongoose.Schema({
     username: String,
     password: String,
     chat_ids: [
@@ -48,6 +48,6 @@ const Message = mongoose.model("Message", new mongoose.Schema({
 })
 );
 
-module.exports = User;
-module.exports = Chat;
-module.exports = Message;
+module.exports.USER = USER;
+module.exports.Chat = Chat;
+module.exports.Message = Message;
