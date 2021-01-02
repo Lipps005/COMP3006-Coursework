@@ -7,7 +7,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
 const routes = require("./routes");
-const ACCESS_TOKEN_SECRET = "doubledoubletoilandtrouble";
+const authorization = require("./authorization");
 
 let port = 9000;
 
@@ -20,27 +20,14 @@ app.use(express.static(path.join(__dirname, "static")));
 // Enable processing of post forms.
 app.use(express.urlencoded({extended: true}));
 
-function authToken(req, res, next) {
-   let token = req.headers['authorization'];
-   if (!token)
-   {
-      return res.status(403).send({message: "No token provided!"});
-   }
-   jwt.verify(token, ACCESS_TOKEN_SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(401).send({ message: "Unauthorized!" });
-    }
-    req.body.user_id = decoded.user_id;
+ app.use(function(req, res, next) {
+    res.header(
+      "Access-Control-Allow-Headers",
+      "x-access-token, Origin, Content-Type, Accept"
+    );
     next();
   });
-}
-
-function generateAccessToken(user_id) {
-   // exp. 30 mins
-   return jwt.sign(user_id, ACCESS_TOKEN_SECRET, {expiresIn: '1800s'});
-}
-
-
+  
 // Start the app.
 app.listen(port, function () {
    console.log("Listening on " + port);
@@ -54,7 +41,7 @@ app.listen(port, function () {
 //each contact is the name of the other user in the chat. Contact is a ref. to that shared chat[id].
 //select first chat returned and redirect to that url.
 //if no chats exist, choose a random user who is logged in and redirect to that url.
-app.get("/login");
+app.get("/login", authorization.authToken, routes.loginUserRoute);
 
 
 //chat page - authorize token (if exists) - redirect to login page if not verified or none exists
@@ -65,13 +52,13 @@ app.get("/login");
 app.get("/users/:userid/chat/:chatid");
 
 //verify credentials & generate JWT token. redirect to chat page.
-app.post("/api/auth/login");
+app.post("/api/auth/login", routes.verifyLoginUserRoute);
 
 //logout - delete token, redirect to login page.
 app.post("/api/auth/logout");
 
 
-//post message in chat
+//post message in chat outside socket
 
 app.post("api/:chatid/message");
 
