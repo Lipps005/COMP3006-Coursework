@@ -61,11 +61,21 @@ async function userHomeRoute(req, res)
 
 async function userChatRoute(req, res)
 {
-   res.render("user", {chats: req.app.get("chats")});
+      authorization.authToken(req, res);
+   if (req.body.user !== null)
+   {
+      res.render("user", {chats: req.app.get("chats")});
+
+   } else
+   {
+      res.redirect("/login");
+   }
+   
 }
 
 async function verifyLoginUserRoute(req, res)
 {
+   res.clearCookie('authcookie');
    let aqz = await db.findUserByUsername(req.body.user_id);
    if (aqz)
    {
@@ -75,11 +85,11 @@ async function verifyLoginUserRoute(req, res)
          const token = authorization.generateAccessToken({user_id: aqz._id});
          console.log("here");
          res.cookie('authcookie',token,{expiresIn:36000,httpOnly:true});
-         res.redirect("/users/" + req.body.user.user_id);
+         res.redirect("/users/" + aqz._id);
          return;
       }
    }
-   res.status(500).send({error: "error verifying user"});
+   res.status(500).redirect("/login");
 
 }
 
