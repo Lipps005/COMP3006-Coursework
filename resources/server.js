@@ -8,6 +8,7 @@ const mongoose = require("mongoose");
 const path = require("path");
 const routes = require("./routes");
 const authorization = require("./authorization");
+const cookieparser = require("cookie-parser");
 
 let port = 9000;
 
@@ -17,7 +18,7 @@ app = express();
 // Set up the static files.
 app.use(express.static(path.join(__dirname, "static")));
 
-
+app.use(cookieparser());
 
 app.set("views", path.join("../", "views"));
 app.set("view engine", "ejs");
@@ -25,13 +26,13 @@ app.set("view engine", "ejs");
 // Enable processing of post forms.
 app.use(express.urlencoded({extended: true}));
 
- app.use(function(req, res, next) {
-    res.header(
-      "Access-Control-Allow-Headers",
-      "x-access-token, Origin, Content-Type, Accept"
-    );
-    next();
-  });
+// app.use(function(req, res, next) {
+//    res.header(
+//      "Access-Control-Allow-Headers",
+//      "Origin, Content-Type, Accept"
+//    );
+//    next();
+//  });
   
 // Start the app.
 app.listen(port, function () {
@@ -54,7 +55,7 @@ app.get("/login", routes.loginUserRoute);
 //verify chat exists
 //start chat socket
 //render all chat messages
-app.get("/users/:userid/chat/:chatid");
+app.get("/users/:userid/chat/:chatid", routes.userChatRoute);
 
 app.get("/users/:userid", routes.userHomeRoute);
 
@@ -68,5 +69,3 @@ app.post("/api/auth/logout");
 //post message in chat outside socket
 
 app.post("api/:chatid/message");
-
-

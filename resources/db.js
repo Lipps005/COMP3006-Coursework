@@ -99,6 +99,7 @@ async function createChat(id)
    }
    else
    {
+      
       const newChat = new models.CHAT({
          users: [mongoose.Types.ObjectId(id), mongoose.Types.ObjectId(anonUser._id)]
       });

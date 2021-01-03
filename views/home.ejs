@@ -72,21 +72,21 @@
          input:not([type="submit"]):focus {
             background-color: #b2c2bf;
          }
-         
+
          input:not([type="submit"]):focus::-webkit-input-placeholder
-               {
-                 opacity: 0;
-            }
-            
+         {
+            opacity: 0;
+         }
+
          input[type=submit] {
             background-color: #c0ded9;
          }
-         
+
          input[type=submit]:active {
             background-color:  #3b3a30;
             color: white;
          }
-         
+
 
          /* Header/logo Title */
          .header {
@@ -101,11 +101,11 @@
             font-size: 150%;
             margin-left: -0.5em;
          }
-         
+
          .main-header
          {
-             font-size: 200%;
-             margin-left: 0;
+            font-size: 200%;
+            margin-left: 0;
          }
 
          /* Column container */
@@ -150,18 +150,18 @@
             .row{   
                flex-direction: column;
             }
-            
+
             .body
             {
                overflow-y: scroll;
             }
-            
+
             .flex-div-50
             {
                width: 100vw;
             }
          }
-         
+
          .typewriter-effect {
             border-right: .15em solid #c0ded9; 
             animation: typing 10s steps(30, end) infinite, blink-caret .85s step-end infinite;
@@ -198,9 +198,12 @@
          <div class="flex-div-50">
             <div class="login-container">
                <h1 class="header main-header"> Login</h1>
-               <input id="usernameInput" type="text" name="username" placeholder="Username" aria-label="username" required>
-               <input id="passwordInput" type="password" name="password" placeholder="Password" aria-label="password" required>
-               <input type="submit" value="Login">
+               <form action="/api/auth/login" method="post">
+                  <input id="user_id" type="text" name="user_id" placeholder="Username" aria-label="username" required>
+                  <input id="password" type="password" name="password" placeholder="Password" aria-label="password" required>
+                  <input type="submit" value="Login">
+               </form>
+
             </div>
          </div>
       </div>

@@ -8,8 +8,6 @@ const db = require("./db");
 const authorization = require("./authorization");
 
 
-
-
 async function loginUserRoute(req, res, next)
 {
    authorization.authToken(req, res);
@@ -39,36 +37,53 @@ async function userHomeRoute(req, res)
          let newchat = await db.createChat(req.body.user.user_id);
          if(newchat)
          {
-            console.log(newchat);
+            console.log("new chat:");
+            console.log( newchat._id);
+            req.app.set("chats", newchat);
+            res.redirect("/users/"+req.body.user.user_id+"/chat/"+newchat._id);
          }
       }
       else
       {
-         res.send(aqz);
+         console.log("all chats:");
+         console.log(aqz);
+         req.app.set("chats", aqz);
+         res.redirect("/users/"+req.body.user.user_id+"/chat/"+aqz[0]._id);
       }
 
    } else
    {
+      res.redirect("/login");
       res.render("home", {});
    }
 }
 
+
+async function userChatRoute(req, res)
+{
+   res.render("user", {chats: req.app.get("chats")});
+}
 
 async function verifyLoginUserRoute(req, res)
 {
    let aqz = await db.findUserByUsername(req.body.user_id);
    if (aqz)
    {
+      console.log("here");
       if (aqz.password === req.body.password)
       {
-         const token = authorization.generateAccessToken({user_id: aqz.id});
-         return res.status(200).send(token);
+         const token = authorization.generateAccessToken({user_id: aqz._id});
+         console.log("here");
+         res.cookie('authcookie',token,{expiresIn:36000,httpOnly:true});
+         res.redirect("/users/" + req.body.user.user_id);
+         return;
       }
    }
-   return res.status(500).send({error: "error verifying user"});
+   res.status(500).send({error: "error verifying user"});
 
 }
 
 module.exports.loginUserRoute = loginUserRoute;
 module.exports.verifyLoginUserRoute = verifyLoginUserRoute;
 module.exports.userHomeRoute = userHomeRoute;
+module.exports.userChatRoute = userChatRoute;

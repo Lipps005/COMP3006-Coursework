@@ -7,15 +7,15 @@ const ACCESS_TOKEN_SECRET = "doubledoubletoilandtrouble";
 
 function authToken(req, res) {
    //retreive token from http header
-   let token = req.headers['x-access-token'];
-   if (!token)
+   const authcookie = req.cookies.authcookie;
+   if (!authcookie)
    {
       //respond 403 if no token
       return req.body.user = null;
    }
    
    //verify token using secret
-   jwt.verify(token, ACCESS_TOKEN_SECRET, (err, decoded) => {
+   jwt.verify(authcookie, ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) {
        
       return req.body.user = null;
