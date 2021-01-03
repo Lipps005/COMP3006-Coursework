@@ -5,25 +5,25 @@
 const jwt = require("jsonwebtoken");
 const ACCESS_TOKEN_SECRET = "doubledoubletoilandtrouble";
 
-function authToken(req, res, next) {
+function authToken(req, res) {
    //retreive token from http header
    let token = req.headers['x-access-token'];
    if (!token)
    {
       //respond 403 if no token
-      return res.status(403).send({ message: "No token provided!" });
+      return req.body.user = null;
    }
    
    //verify token using secret
    jwt.verify(token, ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) {
        
-      return res.status(401).send({ message: "Unauthorised Access!" });;
+      return req.body.user = null;
     }
     //retreive user id and pass control onto route.
-    req.body.user_id = decoded.user_id;
-    next();
+    req.body.user = decoded.user_id;
   });
+  
 }
 
 //express routes - pathways into application. 
