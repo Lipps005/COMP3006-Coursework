@@ -28,49 +28,81 @@ async function userHomeRoute(req, res)
 
    console.log("redirected here!");
    authorization.authToken(req, res);
-   if (req.body.user !== null)
+   if (req.body.user !== null && req.params.userid === req.body.user.user_id)
    {
-      let aqz = await db.getUserChats(req.body.user.user_id);
+      let aqz = await db.getUserContacts(req.body.user.user_id);
       console.log(aqz);
       if (!aqz || aqz.length < 1)
       {
-         let newchat = await db.createChat(req.body.user.user_id);
-         if(newchat)
+         let contactId = await db.createChat(req.body.user.user_id);
+         console.log(contactId);
+         if (contactId)
          {
             console.log("new chat:");
-            console.log( newchat._id);
-            req.app.set("chats", newchat);
-            res.redirect("/users/"+req.body.user.user_id+"/chat/"+newchat._id);
+            console.log(contactId.username);
+            res.redirect("/users/" + req.body.user.user_id + "/chat/" + contactId.username);
+         } else
+         {
+            res.status("500").send("whoops! Looks like there arent any other users!");
          }
-      }
-      else
+      } else
       {
          console.log("all chats:");
          console.log(aqz);
-         req.app.set("chats", aqz);
-         res.redirect("/users/"+req.body.user.user_id+"/chat/"+aqz[0]._id);
+         res.redirect("/users/" + req.body.user.user_id + "/chat/" + aqz[0].username);
       }
 
    } else
    {
+      res.clearCookie('authcookie');
       res.redirect("/login");
-      res.render("home", {});
    }
 }
 
 
 async function userChatRoute(req, res)
 {
-      authorization.authToken(req, res);
-   if (req.body.user !== null)
+   authorization.authToken(req, res);
+   console.log(req.params.userid);
+   if (req.body.user !== null && req.params.userid === req.body.user.user_id)
    {
-      res.render("user", {chats: req.app.get("chats")});
+      const friend = req.params.friendusername;
+
+      let aqz = await db.findUserByUsername(friend);
+      let user = await db.findUserById(req.params.userid);
+
+      if (aqz && user)
+      {
+         if (user.contact_ids.includes(aqz._id))
+         {
+            //friends. can continue.
+            let chat = await db.getChat(req.params.userid, aqz._id);
+            let contacts = await db.getUserContacts(req.params.userid);
+            console.log(chat);
+            res.render("user", {contacts: contacts, messages: chat.messages});
+         } else
+         {
+            res.status("403");
+         }
+      } else
+      {
+         res.status("500");
+      }
+      //check user is part of chat id
+      //return chat and all messages
+      res.render("user", {});
+
+
 
    } else
    {
+      res.clearCookie('authcookie');
       res.redirect("/login");
+
+
+
    }
-   
+
 }
 
 async function verifyLoginUserRoute(req, res)
@@ -84,7 +116,7 @@ async function verifyLoginUserRoute(req, res)
       {
          const token = authorization.generateAccessToken({user_id: aqz._id});
          console.log("here");
-         res.cookie('authcookie',token,{expiresIn:36000,httpOnly:true});
+         res.cookie('authcookie', token, {expiresIn: 36000, httpOnly: true});
          res.redirect("/users/" + aqz._id);
          return;
       }

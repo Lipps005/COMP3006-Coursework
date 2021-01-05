@@ -26,14 +26,11 @@ app.set("view engine", "ejs");
 // Enable processing of post forms.
 app.use(express.urlencoded({extended: true}));
 
-// app.use(function(req, res, next) {
-//    res.header(
-//      "Access-Control-Allow-Headers",
-//      "Origin, Content-Type, Accept"
-//    );
-//    next();
-//  });
-  
+function nocache(req, res, next) {
+  res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+  res.header('Expires', '-1');
+  next();
+}
 // Start the app.
 app.listen(port, function () {
    console.log("Listening on " + port);
@@ -47,7 +44,7 @@ app.listen(port, function () {
 //each contact is the name of the other user in the chat. Contact is a ref. to that shared chat[id].
 //select first chat returned and redirect to that url.
 //if no chats exist, choose a random user who is logged in and redirect to that url.
-app.get("/login", routes.loginUserRoute);
+app.get("/login", nocache, routes.loginUserRoute);
 
 
 //chat page - authorize token (if exists) - redirect to login page if not verified or none exists
@@ -55,12 +52,12 @@ app.get("/login", routes.loginUserRoute);
 //verify chat exists
 //start chat socket
 //render all chat messages
-app.get("/users/:userid/chat/:chatid", routes.userChatRoute);
+app.get("/users/:userid/chat/:friendusername", nocache, routes.userChatRoute);
 
-app.get("/users/:userid", routes.userHomeRoute);
+app.get("/users/:userid", nocache, routes.userHomeRoute);
 
 //verify credentials & generate JWT token. redirect to chat page.
-app.post("/api/auth/login", routes.verifyLoginUserRoute);
+app.post("/api/auth/login", nocache, routes.verifyLoginUserRoute);
 
 //logout - delete token, redirect to login page.
 app.post("/api/auth/logout");
