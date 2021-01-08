@@ -60,9 +60,9 @@ async function getUserContacts(id)
       }
       try
       {
-         
+
          let resultContacts = await models.USER.find({_id: result[0].contact_ids});
-         ifs (!resultContacts)
+         if (!resultContacts)
          {
             console.log("returning false");
             return false;
@@ -177,9 +177,50 @@ async function createChat(id)
    }
 }
 
+
+async function registerSocketID(clientid, socketid)
+{
+
+   try
+   {
+      let user1 = await models.USER.findOne({_id: mongoose.Types.ObjectId(clientid)});
+      await user1.updateOne({socket_id: socketid});
+
+      return user1;
+   } catch (err)
+   {
+      console.log("might need to update models");
+      return false;
+   }
+}
+
+async function updateUserSocket(socketid)
+{
+   try
+   {
+      let user1 = await models.USER.findOne({socket_id: socketid});
+      if(user1)
+      {
+         await user1.updateOne({socket_id: socketid});
+         return user1;
+      }
+      else
+      {
+         return false;
+      }
+
+      
+   } catch (err)
+   {
+      return false;
+   }
+}
+
 module.exports.findUserByUsername = findUserByUsername;
 module.exports.findUserById = findUserById;
 module.exports.getUserContacts = getUserContacts;
 module.exports.getAnonymousChat = getAnonymousUser;
 module.exports.createChat = createChat;
 module.exports.getChat = getChat;
+module.exports.registerSocketID = registerSocketID;
+module.exports.updateUserSocket = updateUserSocket;

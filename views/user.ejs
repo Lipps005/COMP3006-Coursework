@@ -4,6 +4,12 @@
       <title>Chat</title>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 
+            viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✉</text></svg>">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+         
+      </script>
+      <script src="/javascript/main.js"></script>
       <style>
          * {
             box-sizing: border-box;
@@ -66,7 +72,7 @@
             padding: 0;
             overflow-y: hidden;
             height: 100%;
-            
+
          }
 
          /*color accessible placeholder */
@@ -106,7 +112,7 @@
             font-size: 16px;
             font-weight: 600;
             min-height: max-content;
-            
+
             margin-top: 0;
          }
 
@@ -144,7 +150,7 @@
             margin-top: auto;
             width: 100%;
             height: 10%;
-            
+
             min-height: max-content;
             padding: 1vw;
          }
@@ -156,7 +162,7 @@
             width: 100%;
             height: 90%;
             padding: 1vw;                         
-            
+
             overflow-y: scroll;
             min-height: fit-content;
          }                       
@@ -172,15 +178,15 @@
             display: flex;
             flex-wrap: nowrap;
             flex-direction: row;
-            
-            
+
+
          }
-         
+
          .sticky-right
          {
             margin-left: auto;
          }
-         
+
          .sticky-left
          {
             margin-right: auto;
@@ -190,16 +196,16 @@
          {
             margin-left: auto;
             background-color: #eaece5;
-            
+
          }
-         
+
          .received .message-content
          {
             margin-right: auto;
             background-color: #e4e6eb;
-            
+
          }
-         
+
          .message-content
          {
             padding: 7px 8px 12px;
@@ -214,7 +220,7 @@
             margin: 0;
             padding: 0;
             min-width: max-content;
-            
+
          }
 
          .contact {
@@ -233,11 +239,8 @@
             min-height: 50px;
             flex-direction: column;
             margin: 0.3em 0 0.3em;
-            
-
-
          }
-
+         
          .last-online-span
          {
             text-decoration: none;
@@ -247,7 +250,7 @@
             font-weight: 400;
             margin-right: auto;
             letter-spacing: 0em;
-            
+
 
          }
 
@@ -259,7 +262,7 @@
             font-size: 1em;
             font-weight: 600;
             margin-right: auto;
-            
+
          }
 
          /* Column container */
@@ -269,7 +272,7 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            
+
          }
 
          /*Create a column that takes up 50% of its containers width and 100% of its height*/
@@ -304,7 +307,7 @@
             margin: 0;
             padding: 0;
             height: 100%;
-            
+
          }
 
          /*When the screen is less than 700px wide, make the two columns stack on top of each other instead of next to each other */
@@ -316,13 +319,13 @@
             :root {
                --animation-animate-to: 100%;
             }
-            
+
             .flex-div-30, .flex-div-70
             {
                min-width: 100%!important;
                height: 100%;
             }
-            
+
             body
             {
                overflow: auto;
@@ -331,21 +334,21 @@
          }
          @media screen and (orientation: "landscape")
          {
-                        .row {
+            .row {
                flex-direction: column;
             }
             .flex-div-30, .flex-div-70
             {
                min-width: 100%!important;
             }
-            
+
             .message-sandbox-form
             {
                padding: 0;
-               
+
             }
          }
-         
+
          @media screen and (orientation: "portrait")
          {
             .flex-div-30, .flex-div-70
@@ -355,7 +358,7 @@
          }
 
 
-       
+
 
       </style>
    </head>
@@ -364,58 +367,34 @@
          <div class="flex-div-30">
             <h1 class="header" style="font-size: 200%;">Contacts</h1>
             <div class="contacts-container" id="contacts-roster" aria-live="polite" aria-relevant="additions removals">
-               <div tabindex="1" class="contact">
-                  <% for(i=0; i<contacts.length; i++) { %>
-                  <span  class="contact-name-span"><%= contacts[i].username %></span>
-                  <span class="last-online-span">Last online: 14 minutes ago</span>
-               </div>
-               <% } %>
-               
+               <% for(i=0; i<contacts.length; i++) { %>
+                  <div tabindex="1" class="contact">
+                     <span  class="contact-name-span"><%= contacts[i].username %></span>
+                     <span class="last-online-span">Last online: 14 minutes ago</span>
+                  </div>
+                  <% } %>
+
             </div>
 
          </div>
          <div class="flex-div-70">
             <div class="message-log-marquee">
-               <div class="message-container sticky-right received">
-                  <span class="message-content">When u free?</span>
-               </div>
-                              <div class="message-container sticky-right sent">
-                  <span class="message-content">wondering if u wanna hang out?</span>
-               </div>
-                              <div class="message-container sticky-right sent">
-                  <span class="message-content">we could go to caffine club?</span>
-               </div>
-               <div class="message-container sticky-right received">
-                  <span class="message-content">When u free?</span>
-               </div>
-                              <div class="message-container sticky-right sent">
-                  <span class="message-content">wondering if u wanna hang out?</span>
-               </div>
-                              <div class="message-container sticky-right sent">
-                  <span class="message-content">we could go to caffine club?</span>
-               </div>
-               <div class="message-container sticky-right received">
-                  <span class="message-content">When u free?</span>
-               </div>
-                              <div class="message-container sticky-right sent">
-                  <span class="message-content">wondering if u wanna hang out?</span>
-               </div>
-                              <div class="message-container sticky-right sent">
-                  <span class="message-content">we could go to caffine club?</span>
-               </div>
-               <div class="message-container sticky-right received">
-                  <span class="message-content">When u free?</span>
-               </div>
-                              <div class="message-container sticky-right sent">
-                  <span class="message-content">wondering if u wanna hang out?</span>
-               </div>
-                              <div class="message-container sticky-right sent">
-                  <span class="message-content">we could go to caffine club?</span>
-               </div>
+               <% for(i=0; i<messages.length; i++) { %>
+                  <% if(messages[i].origin_user == currentuser) { %>
+                  <div class="message-container sticky-right sent">
+                     <span class="message-content">messages[i].contents.body</span>
+                  </div>
+                  <% } else { %>
+                  <div class="message-container sticky-right received">
+                     <span class="message-content">messages[i].contents.body</span>
+                  </div>
+                  <%  }%> <!-- else -->
+                  <%  }%><!-- for -->
+
             </div>
             <div class="message-sandbox-form">
                <input id="rog-message" type="text" name="message" placeholder="say something" required>
-               <input type="submit" value="Send">
+               <input type="submit" value="No Message">
             </div>
          </div>
       </div>

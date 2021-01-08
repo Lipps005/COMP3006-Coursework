@@ -71,6 +71,8 @@ async function userChatRoute(req, res)
       let aqz = await db.findUserByUsername(friend);
       let user = await db.findUserById(req.params.userid);
 
+console.log("friend" + aqz);
+console.log("user"+user.username);
       if (aqz && user)
       {
          if (user.contact_ids.includes(aqz._id))
@@ -79,10 +81,11 @@ async function userChatRoute(req, res)
             let chat = await db.getChat(req.params.userid, aqz._id);
             let contacts = await db.getUserContacts(req.params.userid);
             console.log(chat);
-            res.render("user", {contacts: contacts, messages: chat.messages});
+            console.log(contacts);
+            res.render("user", {"contacts": contacts, "messages": chat.messages, "currentuser": req.params.userid});
          } else
          {
-            res.status("403");
+            res.status("403").send("whoops! You cant talk to that person!");
          }
       } else
       {
