@@ -21,6 +21,16 @@ const USER = mongoose.model("USER", new mongoose.Schema({
 })
         );
 
+const MESSAGE = new mongoose.Schema({
+   origin_user: {type: mongoose.Schema.Types.ObjectId, ref: "USER"},
+   origin_time: {type: Date, default: Date.now},
+   contents: {
+      body: String,
+      attachments: []
+   }
+
+});
+
 const CHAT = mongoose.model("CHAT", new mongoose.Schema({
    users: [
       {
@@ -28,31 +38,12 @@ const CHAT = mongoose.model("CHAT", new mongoose.Schema({
          ref: "USER"
       }
    ],
-   messages: [
-      {
-         origin_user: {type: mongoose.Schema.Types.ObjectId, ref: "USER"},
-         origin_time: {type: Date, default: Date.now},
-         contents: {
-            body: String,
-            attachments: []
-         }
-
-      }
-   ]
-})
-        );
+   messages: [MESSAGE]
+   })
+ );
 
 
-//const MESSAGE = mongoose.model("MESSAGE", new mongoose.Schema({
-//   origin_user: {type: mongoose.Schema.Types.ObjectId, ref: "USER"},
-//   origin_time : { type : Date, default: Date.now },
-//   contents: {
-//      body: String,
-//      attachments: []
-//   }
-//   
-//})
-//);
+
 
 module.exports.USER = USER;
 module.exports.CHAT = CHAT;

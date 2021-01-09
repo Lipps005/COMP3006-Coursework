@@ -48,6 +48,24 @@ async function findUserByUsername(username)
    //return name (404 or 200)
 }
 
+
+async function findUserBySocketId(socketid)
+{
+   try
+   {
+      let result = await models.USER.findOne({socket_id: socketid});
+      if (!result)
+      {
+         return false;
+      }
+      return result;
+   } catch (err)
+   {
+      return false;
+   }
+   
+}
+
 async function getUserContacts(id)
 {
    try
@@ -82,9 +100,33 @@ async function getUserContacts(id)
    //if none exist, getAnonymousChat
 }
 
-async function addMessageToChat(chat_id, message)
+async function addMessageToChat(client_id, contact_id, message)
 {
+   const clientid = mongoose.Types.ObjectId(client_id);
+   const contactid = mongoose.Types.ObjectId(contact_id);
+   try
+   {
+      const result = await models.CHAT.findOne({users: {$all: [clientid, contactid]}});
+      if (!result)
+      {
+         return false;
+      }
+      try
+      {
+         await result.updateOne({$push: {messages: {
+                  origin_user: clientid._id,
+                  contents: {body: message}
 
+               }}});
+         return true;
+      } catch (err)
+      {
+         return false;
+      }
+   } catch (err)
+   {
+      return false;
+   }
 }
 
 async function getChat(client_id, contact_id)
@@ -199,17 +241,16 @@ async function updateUserSocket(socketid)
    try
    {
       let user1 = await models.USER.findOne({socket_id: socketid});
-      if(user1)
+      if (user1)
       {
          await user1.updateOne({socket_id: socketid});
          return user1;
-      }
-      else
+      } else
       {
          return false;
       }
 
-      
+
    } catch (err)
    {
       return false;
@@ -224,3 +265,5 @@ module.exports.createChat = createChat;
 module.exports.getChat = getChat;
 module.exports.registerSocketID = registerSocketID;
 module.exports.updateUserSocket = updateUserSocket;
+module.exports.addMessageToChat = addMessageToChat;
+module.exports.findUserBySocketId = findUserBySocketId;
