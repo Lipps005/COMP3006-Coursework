@@ -209,6 +209,8 @@
       .message-content
       {
          padding: 7px 8px 12px;
+         overflow-wrap: break-word;
+         max-width: 40%;
       }
 
       .typing-bubble {
@@ -371,7 +373,8 @@
 
          .flex-div-30, .flex-div-70
          {
-            min-width: 100%!important;
+            flex: 100%;
+            width: 100%!important;
             height: 100%;
          }
 
@@ -379,6 +382,7 @@
          {
             overflow: auto;
          }
+         
 
       }
       @media screen and (orientation: "landscape")
@@ -388,7 +392,7 @@
          }
          .flex-div-30, .flex-div-70
          {
-            min-width: 100%!important;
+            width: 100vw!important;
          }
 
          .message-sandbox-form
@@ -402,7 +406,8 @@
       {
          .flex-div-30, .flex-div-70
          {
-            min-width: 100vw!important;
+            flex: 100%;
+            width: 100vw!important;
          }
       }
 
@@ -419,7 +424,7 @@
             <% for(i=0; i<contacts.length; i++) { %>
                <div tabindex="1" class="contact">
                   <span  class="contact-name-span"><%= contacts[i].username %></span>
-                  <span class="last-online-span">Offline</span>
+                  <span class="last-online-span"><%= contacts[i].socket_ids.length < 1 ? "offline" : "online" %></span>
                </div>
                <% } %>
 

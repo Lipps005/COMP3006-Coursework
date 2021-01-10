@@ -16,7 +16,7 @@ const USER = mongoose.model("USER", new mongoose.Schema({
          ref: "USER"
       }
    ],
-   socket_id: String,
+   socket_ids: [String],
    last_active: Date
 })
         );

@@ -1,5 +1,9 @@
 $(document).ready(function () {
 
+   //scroll to bottom of message marquee
+   $(".message-log-marquee").scrollTop($(".message-log-marquee")[0].scrollHeight);
+
+   //define function for debouncing quick keypress events
    var typing = true;
    function typingDebouncer()
    {
@@ -7,21 +11,27 @@ $(document).ready(function () {
       setTimeout(function () {
          typing = false;
          typingDebouncer();
-      }, 3000);
+      }, 5000);
    }
-
+   //start debouncer
    typingDebouncer();
-   var webWorker = new Worker("/javascript/socketWorker.js");
-   var pathArray = window.location.pathname.split('/');
 
+   //start webworker
+   var webWorker = new Worker("/javascript/socketWorker.js");
+
+   //get URL and send client id to webworker.
+   var pathArray = window.location.pathname.split('/');
    webWorker.postMessage({client: pathArray[2], recipient: "", message: "", event: "INIT_UXID"});
+
+   //when webworker posts message to main js, use switch statement to
+   //process socket events.
    webWorker.onmessage = function (event) {
       switch (event.data.event)
       {
          case "INIT_UXID":
             console.log("init " + event.data.payload);
             break;
-            
+
          case "KEYUPEVENT":
             console.log(event.data.payload);
 
@@ -44,14 +54,14 @@ $(document).ready(function () {
                });
             }
             break;
-            
+
          case "MESSAGE_RECEIVE":
             console.log(event.data.payload);
             console.log(event.data.payload.client);
             if (pathArray[4] === event.data.payload.client)
             {
                $(".typing-bubble").css("visibility", "hidden");
-               $(".typing-bubble").before("<div class='message-container sticky-right received'><span class='message-content'>" + event.data.payload.message + "</span></div>");
+               $(".typing-bubble").before("<div class='message-container sticky-left received'><span class='message-content'>" + event.data.payload.message + "</span></div>");
                $(".message-log-marquee").scrollTop($(".message-log-marquee")[0].scrollHeight);
             } else
             {
@@ -64,11 +74,32 @@ $(document).ready(function () {
                });
             }
             break;
-            
+
+         case "MESSAGE_SENT":
+            if (pathArray[2] === event.data.payload.client)
+            {
+               $(".typing-bubble").before("<div class='message-container sticky-right sent'><span class='message-content'>" + event.data.payload.message + "</span></div>");
+               $(".message-log-marquee").scrollTop($(".message-log-marquee")[0].scrollHeight);
+            }
+
          case "USER_DISCONNECT":
+            $(".contacts-container .contact").each(function () {
+               if ($(this).find(".contact-name-span").text() === event.data.payload)
+               {
+                  let contact = this;
+                  $(contact).find(".last-online-span").text("offline");
+               }
+            });
             break;
-            
+
          case "USER_CONNECT":
+            $(".contacts-container .contact").each(function () {
+               if ($(this).find(".contact-name-span").text() === event.data.payload)
+               {
+                  let contact = this;
+                  $(contact).find(".last-online-span").text("online");
+               }
+            });
             break;
       }
 

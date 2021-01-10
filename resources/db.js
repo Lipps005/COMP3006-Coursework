@@ -53,7 +53,8 @@ async function findUserBySocketId(socketid)
 {
    try
    {
-      let result = await models.USER.findOne({socket_id: socketid});
+      let result = await models.USER.findOne({socket_ids: {$in: [socketid]}});
+      console.log("finding user "+result);
       if (!result)
       {
          return false;
@@ -63,14 +64,14 @@ async function findUserBySocketId(socketid)
    {
       return false;
    }
-   
+
 }
 
 async function getUserContacts(id)
 {
    try
    {
-      const result = await models.USER.find({_id: mongoose.Types.ObjectId(id)}, {_id: 0, contact_ids: 1});
+      const result = await models.USER.findOne({_id: mongoose.Types.ObjectId(id)}, {_id: 0, contact_ids: 1});
       console.log("contacts" + result);
       if (!result)
       {
@@ -79,7 +80,7 @@ async function getUserContacts(id)
       try
       {
 
-         let resultContacts = await models.USER.find({_id: result[0].contact_ids});
+         let resultContacts = await models.USER.find({_id: result.contact_ids});
          if (!resultContacts)
          {
             console.log("returning false");
@@ -226,7 +227,7 @@ async function registerSocketID(clientid, socketid)
    try
    {
       let user1 = await models.USER.findOne({_id: mongoose.Types.ObjectId(clientid)});
-      await user1.updateOne({socket_id: socketid});
+      await user1.updateOne({$push: {socket_ids: socketid}});
 
       return user1;
    } catch (err)
@@ -236,19 +237,18 @@ async function registerSocketID(clientid, socketid)
    }
 }
 
+
+//updating a user socket will try to find the user with the old socket id and remove it
 async function updateUserSocket(socketid)
 {
    try
    {
-      let user1 = await models.USER.findOne({socket_id: socketid});
-      if (user1)
-      {
-         await user1.updateOne({socket_id: socketid});
-         return user1;
-      } else
-      {
-         return false;
-      }
+      let user1 = await models.USER.findOne({socket_ids: {$in: [socketid]}});
+      console.log("updating " + user1);
+      user1.socket_ids.splice(user1.socket_ids.indexOf(socketid));
+      let res = await user1.save();
+      console.log("updating " + res);
+      return res;
 
 
    } catch (err)

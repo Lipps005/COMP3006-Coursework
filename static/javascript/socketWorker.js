@@ -37,6 +37,11 @@ socket.on("MESSAGE_RECEIVE", (msg) =>
         {
            postMessage({event: "MESSAGE_RECEIVE", payload: msg});
         });
+        
+socket.on("MESSAGE_SENT", (msg) =>
+{
+   postMessage({event: "MESSAGE_SENT", payload: msg});
+});
 
 socket.on("USER_CONNECT", (msg) =>
         {

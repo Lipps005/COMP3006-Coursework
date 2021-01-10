@@ -96,7 +96,6 @@ httpserver.listen(3000, function () {
 io.on("connection", function (socket) {
    console.log("a user connected");
 
-   db.updateUserSocket(socket.id);
 // Handler for keyup event from the client.
    socket.on("KEYUPEVENT", async function (msg) {
       var recipient = await db.findUserByUsername(msg.recipient);
@@ -107,7 +106,10 @@ io.on("connection", function (socket) {
          socket.emit("ERROR", "Cannot find that friend :( ");
       } else
       {
-         socket.to(recipient.socket_id).emit("KEYUPEVENT", client.username);
+         for (var i in recipient.socket_ids)
+         {
+            socket.to(recipient.socket_ids[i]).emit("KEYUPEVENT", client.username);
+         }
 
       }
    });
@@ -126,7 +128,17 @@ io.on("connection", function (socket) {
          if (saveMessage)
          {
             msg.client = client.username;
-            socket.to(recipient.socket_id).emit("MESSAGE_RECEIVE", msg);
+            for (var i in recipient.socket_ids)
+            {
+               console.log(msg);
+               socket.to(recipient.socket_ids[i]).emit("MESSAGE_RECEIVE", msg);
+            }
+            msg.client = client._id;
+            for (var j in client.socket_ids)
+            {
+               socket.to(client.socket_ids[j]).emit("MESSAGE_SENT", msg);
+            }
+
          }
 
 
@@ -136,14 +148,27 @@ io.on("connection", function (socket) {
    socket.on("INIT_UXID", async function (msg) {
       let registration = await db.registerSocketID(msg.client, socket.id);
       socket.emit("INIT_UXID", registration ? true : false);
-      if(registration)
+      if (registration)
       {
          var contacts = await db.getUserContacts(registration._id);
-         if(contacts)
+         if (contacts)
          {
-            for(const i in contacts)
+            for (var i in contacts)
             {
-               socket.to(i.socket_id).emit("USER_CONNECT", registration.username);
+               //if the contact has socket(s) open, tell send back to user message
+               //saying friend is online. 
+               if (contacts[i].socket_ids.length > 0)
+               {
+                  for (var k in registration.socket_ids)
+                  {
+                     socket.to(registration.socket_ids[k]).emit("USER_CONNECT", contacts[i].username);
+                  }
+               }
+               for (var j in contacts[i].socket_ids)
+               {
+                  socket.to(contacts[i].socket_ids[j]).emit("USER_CONNECT", registration.username);
+               }
+
             }
          }
       }
@@ -153,18 +178,41 @@ io.on("connection", function (socket) {
       //find user with socket id that just disconnected.
       //remove socket from user socket list
       //send disconnect message to all of users contacts.
-      console.log("user disconnected "+socket.id);
+      console.log("user disconnected " + socket.id);
       var user = await db.findUserBySocketId(socket.id);
-      if(user)
+      console.log("user " + user);
+      if (user)
       {
-         var contacts = await db.getUserContacts(user._id);
-         if(contacts)
+         var updateSockets = await db.updateUserSocket(socket.id);
+         if (updateSockets)
          {
-            for(const i in contacts)
+            console.log("updated sockets " + updateSockets);
+            console.log(updateSockets);
+            if (updateSockets.socket_ids.length < 1)
             {
-               socket.to(i.socket_id).emit("USER_DISCONNECT", user.username);
+               var contacts = await db.getUserContacts(user._id);
+               if (contacts)
+               {
+                  for (var i in contacts)
+                  {
+//               if (contacts[i].socket_ids.length < 1)
+//               {
+//                  for (var k in user.socket_ids)
+//                  {
+//                     socket.to(user.socket_ids[k]).emit("USER_DISCONNECT", contacts[i].username);
+//                  }
+//               }
+                     for (var j in contacts[i].socket_ids)
+                     {
+                        socket.to(contacts[i].socket_ids[j]).emit("USER_DISCONNECT", user.username);
+                     }
+
+                  }
+               }
             }
          }
+
+
       }
    });
 
