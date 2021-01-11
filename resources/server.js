@@ -66,6 +66,10 @@ app.get("/users/:userid", nocache, routes.userHomeRoute);
 //verify credentials & generate JWT token. redirect to chat page.
 app.post("/api/auth/login", nocache, routes.verifyLoginUserRoute);
 
+//expects params client_id, friend username
+//if contacts are friends, returns chat obj
+app.post("/api/nav", routes.returnChatMessages);
+
 //logout - delete token, redirect to login page.
 app.post("/api/auth/logout");
 

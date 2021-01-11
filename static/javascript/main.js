@@ -33,9 +33,7 @@ $(document).ready(function () {
             break;
 
          case "KEYUPEVENT":
-            console.log(event.data.payload);
-
-            console.log(event.data.payload);
+            var pathArray = window.location.pathname.split('/');
             if (pathArray[4] === event.data.payload)
             {
                if (!typing)
@@ -46,18 +44,21 @@ $(document).ready(function () {
             } else
             {
                $(".contacts-container .contact").each(function () {
-                  if ($(this).find(".contact-name-span").text() === event.data.payload)
+                  if ($(this).attr('id') === event.data.payload)
                   {
                      let contact = this;
+
                      $(contact).find(".last-online-span").text("typing ...");
+
                   }
                });
             }
             break;
 
          case "MESSAGE_RECEIVE":
+            var pathArray = window.location.pathname.split('/');
             console.log(event.data.payload);
-            console.log(event.data.payload.client);
+            console.log(pathArray[4]);
             if (pathArray[4] === event.data.payload.client)
             {
                $(".typing-bubble").css("visibility", "hidden");
@@ -66,7 +67,8 @@ $(document).ready(function () {
             } else
             {
                $(".contacts-container .contact").each(function () {
-                  if ($(this).find(".contact-name-span").text() === event.data.payload.client)
+                  console.log($(this).attr('id'));
+                  if ($(this).attr('id') === event.data.payload.client)
                   {
                      let contact = this;
                      $(contact).find(".last-online-span").text(event.data.payload.message);
@@ -76,6 +78,7 @@ $(document).ready(function () {
             break;
 
          case "MESSAGE_SENT":
+            var pathArray = window.location.pathname.split('/');
             if (pathArray[2] === event.data.payload.client)
             {
                $(".typing-bubble").before("<div class='message-container sticky-right sent'><span class='message-content'>" + event.data.payload.message + "</span></div>");
@@ -84,7 +87,7 @@ $(document).ready(function () {
 
          case "USER_DISCONNECT":
             $(".contacts-container .contact").each(function () {
-               if ($(this).find(".contact-name-span").text() === event.data.payload)
+               if ($(this).attr('id') === event.data.payload)
                {
                   let contact = this;
                   $(contact).find(".last-online-span").text("offline");
@@ -93,8 +96,10 @@ $(document).ready(function () {
             break;
 
          case "USER_CONNECT":
-            $(".contacts-container .contact").each(function () {
-               if ($(this).find(".contact-name-span").text() === event.data.payload)
+            $(".contacts-container > .contact").each(function () {
+               console.log($(this).attr('id'));
+               console.log()
+               if ($(this).attr('id') === event.data.payload)
                {
                   let contact = this;
                   $(contact).find(".last-online-span").text("online");
@@ -122,14 +127,52 @@ $(document).ready(function () {
 //delgate on click event to contact container.
 //changes the url to show selected contact, deals with
 //fetching the new contacts messages
-   $(".contacts-container").on("click", "div", function (e) {
-      $(".contacts-container .contact").css("background-color", "white");
-      $(this).css("background-color", "#e4e6eb");
-      console.log("here");
-      e.preventDefault();
-      let name = $(this).find("span.contact-name-span").text();
-      history.replaceState(name, '', name);
+   $(".contacts-container").on("click", ".contact", function (e)
+   {
+      var pathArray = window.location.pathname.split('/');
+      var name = $(this).attr('id');
+      if (name !== pathArray[4])
+      {
+         var xhrReq = $.post("/api/nav", {client_id: pathArray[2], contact_username: name})
+                 .done(function (data)
+                 {
+                    $(".contacts-container > .contact").each(function () {
+                       console.log(this);
+                       if ($(this).attr('id') === name)
+                       {
+                          $(this).focus();
+                          $(this).prop("active", true);
+                          $(this).css("background-color", "#e4e6eb");
+                       } else
+                       {
+                          $(this).prop("active", false);
+                          $(this).css("background-color", "white");
+                       }
 
+                    });
+                    $(".message-log-marquee").remove(".message-container");
+                    for (var i = 0; i < data.messages.length; i++) {
+                       if (data.messages[i].origin_user === pathArray[2])
+                       {
+                          $(".typing-bubble").before("<div class='message-container sticky-right sent'><span class='message-content'>" + data.messages[i].contents.body + "</span></div>");
+                          $(".message-log-marquee").scrollTop($(".message-log-marquee")[0].scrollHeight);
+                       } else
+                       {
+                          $(".typing-bubble").before("<div class='message-container sticky-left received'><span class='message-content'>" + data.messages[i].contents.body + "</span></div>");
+                          $(".message-log-marquee").scrollTop($(".message-log-marquee")[0].scrollHeight);
+                       }
+
+
+                    }
+                    e.preventDefault();
+                    history.replaceState(name, '', name);
+                 })
+                 .fail(function (data, status, error)
+                 {
+                    console.log("error status: " + status + " /n + error: " + error);
+                 });
+
+      }
    });
 
 //Changes the message inside the 'send' button to improve accessibility.
@@ -152,6 +195,10 @@ $(document).ready(function () {
       $("input[type='text']").val('').keyup();
    });
 
+   $(".message-container").on("click", "i", function ()
+   {
+      $(this).closest(".message-container").remove();
+   });
 
 });
 

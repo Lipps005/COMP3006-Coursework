@@ -94,18 +94,43 @@ console.log("user"+user.username);
       //check user is part of chat id
       //return chat and all messages
       res.render("user", {});
-
-
-
    } else
    {
       res.clearCookie('authcookie');
       res.redirect("/login");
-
-
-
    }
+}
 
+async function returnChatMessages(req, res)
+{
+   authorization.authToken(req, res);
+   if (req.body.user !== null && req.body.user.user_id === req.body.client_id)
+   {
+      const friend = req.body.contact_username;
+
+      let aqz = await db.findUserByUsername(friend);
+      let user = await db.findUserById(req.body.client_id);
+
+      if (aqz && user)
+      {
+         if (user.contact_ids.includes(aqz._id))
+         {
+            //friends. can continue.
+            let chat = await db.getChat(req.body.client_id, aqz._id);
+
+            res.send({"messages": chat.messages, "contact_id": aqz._id});
+         } else
+         {
+            res.status("403").send("whoops! You cant talk to that person!");
+         }
+      } else
+      {
+         res.status("500");
+      }
+   } else
+   {
+      res.status("403").send("Not Authorized!");
+   }
 }
 
 async function verifyLoginUserRoute(req, res)
@@ -132,3 +157,4 @@ module.exports.loginUserRoute = loginUserRoute;
 module.exports.verifyLoginUserRoute = verifyLoginUserRoute;
 module.exports.userHomeRoute = userHomeRoute;
 module.exports.userChatRoute = userChatRoute;
+module.exports.returnChatMessages = returnChatMessages;

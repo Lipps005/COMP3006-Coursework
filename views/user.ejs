@@ -6,6 +6,8 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 
             viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✉</text></svg>">
+      <link rel="preconnect" href="https://fonts.gstatic.com">
+      <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Roboto&display=swap" rel="stylesheet">
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
    </script>
@@ -67,7 +69,8 @@
 
       /* Style the body */
       body {
-         font-family: Arial;
+
+         font-family: 'Roboto', sans-serif;
          margin: 0;
          padding: 0;
          overflow-y: hidden;
@@ -194,15 +197,24 @@
 
       .sent .message-content
       {
-         margin-left: auto;
+         margin-left: 5px;
          background-color: #eaece5;
+      }
 
+      .sent > i
+      {
+         margin-left: auto;
       }
 
       .received .message-content
       {
-         margin-right: auto;
+         margin-right: 5px;
          background-color: #e4e6eb;
+      }
+
+      .received > i
+      {
+         margin-right: auto;
 
       }
 
@@ -211,6 +223,23 @@
          padding: 7px 8px 12px;
          overflow-wrap: break-word;
          max-width: 40%;
+
+      }
+
+      .message-container > i
+      {
+         visibility: hidden;
+         cursor: default;
+         font-size: 18px;
+         padding: inherit;
+         font-family: 'Archivo Black', sans-serif;
+      }
+
+      .message-container:hover > i
+      {
+
+         visibility: visible;
+         animation: pop-icon 2s cubic-bezier(0.280, 0.840, 0.420, 1) infinite;;
       }
 
       .typing-bubble {
@@ -233,7 +262,7 @@
          height: 0.8em;
          margin: 3px;
          border-radius: 50%;
-         animation: bounce-7 2s cubic-bezier(0.280, 0.840, 0.420, 1) infinite;
+         animation: bounce-7 1s cubic-bezier(0.280, 0.840, 0.420, 1) infinite;
       }
 
       .typing-bubble>span:nth-child(1)
@@ -259,6 +288,13 @@
          100% { transform: scale(1,1)      translateY(0); }
       }
 
+      @keyframes pop-icon
+      {
+         0%   { transform: scale(1,1)      translateX(0); }
+         10%  { transform: scale(1.1,.9)   translateX(0); }
+         30%  { transform: scale(.9,1.1)   translateX(0.2em) rotate(-20deg);}
+         50%  { transform: scale(1.05,.95) translateX(0) rotate(-20deg) visibility: visible;}
+      }
 
 
       .contacts-container {
@@ -301,6 +337,13 @@
          font-weight: 400;
          margin-right: auto;
          letter-spacing: 0em;
+         /*prevent the div growing, we will set whitespace to nowrap
+         to keep it on one line, set overflow to hidden so it doesnt go
+         out of the div, and set text overflow to ellipses to show there
+         might be more text */
+         white-space: nowrap;
+         overflow: hidden;
+         text-overflow: ellipsis;
 
 
       }
@@ -382,7 +425,7 @@
          {
             overflow: auto;
          }
-         
+
 
       }
       @media screen and (orientation: "landscape")
@@ -422,8 +465,8 @@
          <h1 class="header" style="font-size: 200%;">Contacts</h1>
          <div class="contacts-container" id="contacts-roster" aria-live="polite" aria-relevant="additions removals">
             <% for(i=0; i<contacts.length; i++) { %>
-               <div tabindex="1" class="contact">
-                  <span  class="contact-name-span"><%= contacts[i].username %></span>
+               <div tabindex="1" class="contact" id=<%= contacts[i].username  %> >
+                 <span  class="contact-name-span"><%= contacts[i].username %></span>
                   <span class="last-online-span"><%= contacts[i].socket_ids.length < 1 ? "offline" : "online" %></span>
                </div>
                <% } %>
@@ -436,11 +479,13 @@
             <% for(i=0; i<messages.length; i++) { %>
                <% if(messages[i].origin_user == currentuser) { %>
                <div class="message-container sticky-right sent">
-                  <span class="message-content"><%= messages[i].contents.body %></span>
+                  <i>X</i>
+                  <span id=<%= messages[i]._id  %> class="message-content"> <%= messages[i].contents.body %></span>
                </div>
                <% } else { %>
-               <div class="message-container sticky-right received">
-                  <span class="message-content"><%= messages[i].contents.body %></span>
+               <div class="message-container sticky-left received">
+                  <span id=<%= messages[i]._id  %> class="message-content"><%= messages[i].contents.body %></span>
+                  <i>X</i>
                </div>
                <%  }%> <!-- else -->
                <%  }%><!-- for -->
