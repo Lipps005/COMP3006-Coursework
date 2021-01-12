@@ -184,7 +184,20 @@ async function getAnonymousUser(id)
 
 async function registerUser(username, password)
 {
+   const newUser = new models.USER({
+        username: username,
+        password: password
+      });
+      try
+      {
+         let created = await newUser.save();
+         
 
+         return created;
+      } catch (err)
+      {
+         return false;
+      }
 }
 
 
@@ -267,3 +280,4 @@ module.exports.registerSocketID = registerSocketID;
 module.exports.updateUserSocket = updateUserSocket;
 module.exports.addMessageToChat = addMessageToChat;
 module.exports.findUserBySocketId = findUserBySocketId;
+module.exports.registerUser = registerUser;

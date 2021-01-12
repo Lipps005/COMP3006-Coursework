@@ -19,7 +19,7 @@ async function loginUserRoute(req, res, next)
    {
       res.render("home", {});
    }
-
+   
 }
 
 
@@ -71,8 +71,8 @@ async function userChatRoute(req, res)
       let aqz = await db.findUserByUsername(friend);
       let user = await db.findUserById(req.params.userid);
 
-console.log("friend" + aqz);
-console.log("user"+user.username);
+      console.log("friend" + aqz);
+      console.log("user" + user.username);
       if (aqz && user)
       {
          if (user.contact_ids.includes(aqz._id))
@@ -139,8 +139,9 @@ async function verifyLoginUserRoute(req, res)
    let aqz = await db.findUserByUsername(req.body.user_id);
    if (aqz)
    {
-      console.log("here");
-      if (aqz.password === req.body.password)
+      let comp = await authorization.compareHashes(aqz.password, req.body.password);
+      console.log(comp);
+      if (comp)
       {
          const token = authorization.generateAccessToken({user_id: aqz._id});
          console.log("here");
@@ -149,7 +150,42 @@ async function verifyLoginUserRoute(req, res)
          return;
       }
    }
-   res.status(500).redirect("/login");
+   res.redirect("/login");
+
+}
+
+async function checkUserExists(req, res)
+{
+   let aqz = await db.findUserByUsername(req.body.username);
+   if (aqz)
+   {
+      res.status("200").send({username: req.body.username, exists: true});
+   } else
+   {
+      res.status("200").send({username: req.body.username, exists: false});
+   }
+}
+
+async function signupUser(req, res)
+{
+
+   let aqz = await db.findUserByUsername(req.body.user_id);
+   console.log(aqz);
+   if (!aqz)
+   {
+      const password = await authorization.hashPassword(req.body.password);
+      let register = await db.registerUser(req.body.user_id, password);
+      if (register)
+      {
+         const token = authorization.generateAccessToken({user_id: register._id});
+         res.cookie('authcookie', token, {expiresIn: 36000, httpOnly: true});
+         res.redirect("/users/" + register._id);
+         return;
+      }
+   } else
+   {
+      res.status("401").send("User exists. Please Login instead.");
+   }
 
 }
 
@@ -158,3 +194,5 @@ module.exports.verifyLoginUserRoute = verifyLoginUserRoute;
 module.exports.userHomeRoute = userHomeRoute;
 module.exports.userChatRoute = userChatRoute;
 module.exports.returnChatMessages = returnChatMessages;
+module.exports.checkUserExists = checkUserExists;
+module.exports.signupUser = signupUser;

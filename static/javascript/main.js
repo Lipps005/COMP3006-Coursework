@@ -5,6 +5,7 @@ $(document).ready(function () {
 
    //define function for debouncing quick keypress events
    var typing = true;
+   var contacttyping = true;
    function typingDebouncer()
    {
       $(".typing-bubble").css("visibility", "hidden");
@@ -13,8 +14,17 @@ $(document).ready(function () {
          typingDebouncer();
       }, 5000);
    }
+   function contactDebouncer()
+   {
+      setTimeout(function () {
+         contacttyping = false;
+         contactDebouncer();
+      }, 2000);
+   }
+ 
    //start debouncer
    typingDebouncer();
+   contactDebouncer();
 
    //start webworker
    var webWorker = new Worker("/javascript/socketWorker.js");
@@ -46,10 +56,13 @@ $(document).ready(function () {
                $(".contacts-container .contact").each(function () {
                   if ($(this).attr('id') === event.data.payload)
                   {
-                     let contact = this;
-
-                     $(contact).find(".last-online-span").text("typing ...");
-
+                     if(!contacttyping)
+                     {
+                     var contact = $(this);
+                     contact.find(".last-online-span").addClass("contact-typing");
+                     setTimeout(function(){contact.find(".last-online-span").removeClass("contact-typing"); }, 1000);
+                     contacttyping = true;
+                  }
                   }
                });
             }

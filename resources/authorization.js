@@ -4,6 +4,9 @@
  */
 const jwt = require("jsonwebtoken");
 const ACCESS_TOKEN_SECRET = "doubledoubletoilandtrouble";
+const bcrypt = require('bcrypt');
+
+const rounds = 10;
 
 function authToken(req, res) {
    //retreive token from http header
@@ -13,17 +16,17 @@ function authToken(req, res) {
       //respond 403 if no token
       return req.body.user = null;
    }
-   
+
    //verify token using secret
    jwt.verify(authcookie, ACCESS_TOKEN_SECRET, (err, decoded) => {
-    if (err) {
-       
-      return req.body.user = null;
-    }
-    //retreive user id and pass control onto route.
-    req.body.user = decoded.user_id;
-  });
-  
+      if (err) {
+
+         return req.body.user = null;
+      }
+      //retreive user id and pass control onto route.
+      req.body.user = decoded.user_id;
+   });
+
 }
 
 //express routes - pathways into application. 
@@ -33,8 +36,20 @@ function generateAccessToken(id) {
 }
 
 
+async function hashPassword(password)
+{
+   return await bcrypt.hash(password, rounds);
+}
 
+async function compareHashes(hash, password)
+{
+   console.log(password + " " + hash);
+   const match = await bcrypt.compare(password, hash);
+   return match;
+}
 
 module.exports.authToken = authToken;
 module.exports.generateAccessToken = generateAccessToken;
+module.exports.compareHashes = compareHashes;
+module.exports.hashPassword = hashPassword;
 

@@ -77,6 +77,9 @@ app.post("/api/auth/logout");
 //post message in chat outside socket
 app.post("api/:chatid/message");
 
+//check if user exists
+app.post("/api/validate", routes.checkUserExists);
+app.post("/api/signup", routes.signupUser);
 
 httpserver = http.createServer(app);
 

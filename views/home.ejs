@@ -1,11 +1,12 @@
 <html>
    <head>
-      <title>Page Title</title>
+      <title>Login</title>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 
             viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✉</text></svg>">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="/javascript/home.js"></script>
       <style>
          * {
             box-sizing: border-box;
@@ -90,7 +91,10 @@
             color: white;
          }
 
-
+         #password
+         {
+            background-color: #c0ded9;
+         }
          /* Header/logo Title */
          .header {
             padding: 10px;
@@ -201,10 +205,10 @@
          <div class="flex-div-50">
             <div class="login-container">
                <h1 class="header main-header"> Login</h1>
-               <form action="/api/auth/login" method="post">
+               <form id="loginForm" action="/api/auth/login" method="post">
                   <input id="user_id" type="text" name="user_id" placeholder="Username" aria-label="username" required>
                   <input id="password" type="password" name="password" placeholder="Password" aria-label="password" required>
-                  <input type="submit" value="Login">
+                  <input type="submit" value="Fill Out Form">
                </form>
 
             </div>
