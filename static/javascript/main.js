@@ -200,19 +200,21 @@ $(document).ready(function () {
 //Event handler for clicking send button
    $("input[type='submit']").on("click submit", function ()
    {
-      let message = $("input[type='text']").val();
-      let pathArray = window.location.pathname.split('/');
-      webWorker.postMessage({client: pathArray[2], recipient: pathArray[4], message: message, event: "MESSAGE_SENT"});
-      $(".typing-bubble").before("<div class='message-container sticky-right sent'><span class='message-content'>" + message + "</span></div>");
-      $(".message-log-marquee").scrollTop($(".message-log-marquee")[0].scrollHeight);
-      $("input[type='text']").val('').keyup();
+      if($("input[type='text']").val())
+      {
+         let message = $("input[type='text']").val();
+         let pathArray = window.location.pathname.split('/');
+         webWorker.postMessage({client: pathArray[2], recipient: pathArray[4], message: message, event: "MESSAGE_SENT"});
+         $(".typing-bubble").before("<div class='message-container sticky-right sent'><span class='message-content'>" + message + "</span></div>");
+         $(".message-log-marquee").scrollTop($(".message-log-marquee")[0].scrollHeight);
+         $("input[type='text']").val('').keyup();
+      }
    });
-
+   
    $(".message-container").on("click", "i", function ()
    {
       $(this).closest(".message-container").remove();
    });
-
 });
 
 
